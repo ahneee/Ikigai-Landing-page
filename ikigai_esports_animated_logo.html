@@ -1,0 +1,242 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@700&family=Orbitron:wght@900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  #stage {
+    width: 100%;
+    height: 520px;
+    background: #000;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  canvas#particles {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+  }
+  #logo-wrap {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    opacity: 0;
+  }
+  #ikg-text {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 96px;
+    font-weight: 900;
+    color: #FFD700;
+    letter-spacing: 12px;
+    line-height: 1;
+    position: relative;
+    filter: drop-shadow(0 0 0px #FFD700);
+  }
+  #sub-text {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 14px;
+    color: #fff;
+    text-transform: uppercase;
+    margin-top: 8px;
+    opacity: 0;
+  }
+  #divider {
+    width: 0px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #FFD700, transparent);
+    margin: 12px auto;
+  }
+  #sweep {
+    position: absolute;
+    top: 0; left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,215,0,0.18), rgba(255,255,255,0.25), rgba(255,215,0,0.18), transparent);
+    z-index: 5;
+    pointer-events: none;
+  }
+  #vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.85) 100%);
+    z-index: 4;
+    pointer-events: none;
+  }
+  #replay-btn {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    z-index: 20;
+    background: rgba(255,215,0,0.12);
+    border: 1px solid rgba(255,215,0,0.4);
+    color: #FFD700;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    padding: 8px 18px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: background 0.2s;
+  }
+  #replay-btn:hover { background: rgba(255,215,0,0.22); }
+</style>
+
+<div id="stage">
+  <canvas id="particles"></canvas>
+  <div id="vignette"></div>
+  <div id="sweep"></div>
+  <div id="logo-wrap">
+    <div id="ikg-text">IKG</div>
+    <div id="divider"></div>
+    <div id="sub-text">IKIGAI ESPORTS</div>
+  </div>
+  <button id="replay-btn">↺ REPLAY</button>
+</div>
+
+<script>
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+const stage = document.getElementById('stage');
+const logoWrap = document.getElementById('logo-wrap');
+const ikgText = document.getElementById('ikg-text');
+const subText = document.getElementById('sub-text');
+const divider = document.getElementById('divider');
+const sweep = document.getElementById('sweep');
+
+let W, H, particles = [], running = false, animId = null;
+
+function resize() {
+  W = canvas.width = stage.offsetWidth;
+  H = canvas.height = stage.offsetHeight;
+}
+resize();
+
+function rand(a, b) { return a + Math.random() * (b - a); }
+
+function spawnParticles() {
+  particles = [];
+  for (let i = 0; i < 120; i++) {
+    particles.push({
+      x: rand(0, W),
+      y: rand(0, H),
+      r: rand(0.5, 2.2),
+      vx: rand(-0.3, 0.3),
+      vy: rand(-0.6, -0.15),
+      alpha: rand(0.2, 0.85),
+      gold: Math.random() > 0.4
+    });
+  }
+}
+
+function drawParticles() {
+  ctx.clearRect(0, 0, W, H);
+  for (let p of particles) {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = p.gold
+      ? `rgba(255,215,0,${p.alpha})`
+      : `rgba(255,255,255,${p.alpha * 0.5})`;
+    ctx.fill();
+    p.x += p.vx;
+    p.y += p.vy;
+    if (p.y < -5) { p.y = H + 5; p.x = rand(0, W); }
+  }
+}
+
+function lerp(a, b, t) { return a + (b - a) * t; }
+
+function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+function easeIn(t) { return t * t * t; }
+
+let startTime = null;
+const PHASE = {
+  DARK:     [0,    600],
+  PARTICLES:[300,  1000],
+  SWEEP:    [800,  1400],
+  LOGO_IN:  [1200, 1900],
+  GLOW:     [1800, 2400],
+  DIVIDER:  [2000, 2500],
+  SUB:      [2300, 2900],
+  HOLD:     [2900, 4500],
+};
+
+function progress(now, start, end) {
+  return Math.min(1, Math.max(0, (now - start) / (end - start)));
+}
+
+function animate(ts) {
+  if (!startTime) startTime = ts;
+  const now = ts - startTime;
+
+  drawParticles();
+
+  // Sweep
+  const sweepP = progress(now, PHASE.SWEEP[0], PHASE.SWEEP[1]);
+  sweep.style.left = lerp(-60, 110, easeOut(sweepP)) + '%';
+
+  // Logo fade + scale in
+  const logoP = progress(now, PHASE.LOGO_IN[0], PHASE.LOGO_IN[1]);
+  const scale = lerp(0.6, 1, easeOut(logoP));
+  logoWrap.style.opacity = easeOut(logoP);
+  logoWrap.style.transform = `scale(${scale})`;
+
+  // Glow pulse on IKG
+  const glowP = progress(now, PHASE.GLOW[0], PHASE.GLOW[1]);
+  const glowSize = Math.sin(glowP * Math.PI) * 32;
+  ikgText.style.filter = `drop-shadow(0 0 ${glowSize}px #FFD700) drop-shadow(0 0 ${glowSize * 0.4}px #fff)`;
+
+  // Divider grow
+  const divP = progress(now, PHASE.DIVIDER[0], PHASE.DIVIDER[1]);
+  divider.style.width = lerp(0, 260, easeOut(divP)) + 'px';
+
+  // Sub text fade
+  const subP = progress(now, PHASE.SUB[0], PHASE.SUB[1]);
+  subText.style.opacity = easeOut(subP);
+
+  // Settle glow
+  if (now > PHASE.GLOW[1]) {
+    const settleP = progress(now, PHASE.GLOW[1], PHASE.HOLD[1]);
+    const baseGlow = lerp(32, 10, easeOut(Math.min(1, settleP * 2)));
+    ikgText.style.filter = `drop-shadow(0 0 ${baseGlow}px #FFD700)`;
+  }
+
+  if (now < PHASE.HOLD[1]) {
+    animId = requestAnimationFrame(animate);
+  } else {
+    running = false;
+  }
+}
+
+function playIntro() {
+  if (running) return;
+  running = true;
+  startTime = null;
+
+  logoWrap.style.opacity = 0;
+  logoWrap.style.transform = 'scale(0.6)';
+  ikgText.style.filter = 'drop-shadow(0 0 0px #FFD700)';
+  divider.style.width = '0px';
+  subText.style.opacity = 0;
+  sweep.style.left = '-60%';
+
+  spawnParticles();
+  if (animId) cancelAnimationFrame(animId);
+  animId = requestAnimationFrame(animate);
+}
+
+document.getElementById('replay-btn').addEventListener('click', (e) => {
+  e.stopPropagation();
+  if (animId) cancelAnimationFrame(animId);
+  running = false;
+  playIntro();
+});
+
+window.addEventListener('resize', resize);
+playIntro();
+</script>
