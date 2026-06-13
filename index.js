@@ -40,13 +40,13 @@ document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => 
 // ===== FLOOR DATA =====
 const floors = {
   1: [
-    { name: 'DLAR', size: 'CEO', desc: 'Dlar (Gerald “Dlar” Trinchera) is a Filipino professional Mobile Legends player and gaming content creator known for his outstanding EXP Lane performances in competitive esports. Having represented top teams across Southeast Asia, he continues to entertain and inspire fans through competitive play, livestreams, and gaming content.', img: '' },
-    { name: 'Shin Gonzaga', size: 'VP', desc: 'Shania Denise “Reika Bieber” Gonzaga is a Filipino content creator, streamer, cosplayer, and social media personality best known for her charming girl-next-door personality earning her the nickname "Sunflower". Through her engaging content, passion for gaming, and genuine connection with her audience, she has built a strong presence within the Filipino gaming community. Shin\'s talent and dedication earned her the opportunity to represent the Philippines on "Good Game Asia", a gaming reality TV show produced by Warner Bros., filmed and broadcast in Singapore. Her appearance on the program highlighted not only her skills as a gamer and creator but also her role as a representative of the growing Filipino gaming scene on an international platform. Through her work, she continues to foster a welcoming and inclusive community while entertaining and empowering audiences across the region.', img: '' },
-    { name: 'Butters', size: 'Operations', desc: 'Ay Isang Bisayang Bisakol', img: '' },
+    { name: 'DLAR', size: 'CEO', desc: 'Dlar (Gerald “Dlar” Trinchera) is a Filipino professional Mobile Legends player and gaming content creator known for his outstanding EXP Lane performances in competitive esports. Having represented top teams across Southeast Asia, he continues to entertain and inspire fans through competitive play, livestreams, and gaming content.', img: 'resources/pic_heads/dlarr.png' },
+    { name: 'Shin Gonzaga', size: 'VP', desc: 'Shania Denise “Reika Bieber” Gonzaga is a Filipino content creator, streamer, cosplayer, and social media personality best known for her charming girl-next-door personality earning her the nickname "Sunflower". Through her engaging content, passion for gaming, and genuine connection with her audience, she has built a strong presence within the Filipino gaming community. Shin\'s talent and dedication earned her the opportunity to represent the Philippines on "Good Game Asia", a gaming reality TV show produced by Warner Bros., filmed and broadcast in Singapore. Her appearance on the program highlighted not only her skills as a gamer and creator but also her role as a representative of the growing Filipino gaming scene on an international platform. Through her work, she continues to foster a welcoming and inclusive community while entertaining and empowering audiences across the region.', img: 'resources/pic_heads/shinn.jpg' },
+    { name: 'Butters', size: 'Operations', desc: 'Ay Isang Bisayang Bisakol - KramTV', img: 'resources/pic_heads/butters.jpg' },
 ],
   2: [
-    { name: 'Kram', size: 'Coach', desc: 'Ay Isang Bisayang Bisakol', img: '' },
-    { name: 'Yuna', size: 'Full Stack Developer', desc: 'Ako lang ito guys :P', img: '' },
+    { name: 'Kram', size: 'Coach', desc: 'Ay Isang Bisayang Bisakol', img: 'resources/pic_heads/kramtv.jpg' },
+    { name: 'Yuna', size: 'Dev', desc: 'Saling pusa lang ako guys :P', img: 'resources/pic_heads/yuna.jpg' },
   ]
 };
 
